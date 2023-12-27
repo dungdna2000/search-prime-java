@@ -1,17 +1,4 @@
-import java.util.ArrayList;
-
-public class Main {
-
-    static byte prime_bits[];
-
-    // ib: 0                    1                      2
-    // i:  0 1 2 3  4  5  6  7  8  9 10 11 12 13 14 15 16 .... (i) 
-    // v:  3 5 7 9 11 13 15 17 19 21 23 25 27 29 31 33 35 .... (i*2+3) = t => i = ( t - 3 ) / 2
-    
-    //static ArrayList<Integer> primes;
-    static long prime_count = 1; 
-
-/*
+/* OBSOLETED - use 1 byte per number 
  *     static void searchPrimes(int N) {
 
         prime_bits = new byte[N/2];
@@ -48,20 +35,29 @@ public class Main {
     }
  */
 
+public class Main {
+
+    static byte prime_bits[];
+
+    // ib: 0                    1                      2
+    // i:  0 1 2 3  4  5  6  7  8  9 10 11 12 13 14 15 16 .... (i) 
+    // v:  3 5 7 9 11 13 15 17 19 21 23 25 27 29 31 33 35 .... (i*2+3) = t => i = ( t - 3 ) / 2
+
+    static long prime_count; 
+
     static void searchPrimes(long N) {
 
         prime_bits = new byte[(int)(N/16+1)];
-        
-        //primes = new ArrayList<Integer>();
-        //primes.add(2);
 
-        // at the beginning, all odd numbers are primes
+        //
+        // initially, set all odd numbers to primes
+        //
         for (int i = 0; i < prime_bits.length; i++)
             prime_bits[i] = (byte)0b11111111; 
 
-        int nsqrt = (int) Math.sqrt(N);
+        long nsqrt = (long)Math.sqrt(N);
 
-        // current bit and byte position 
+        // current bit and byte position so that we can "move" along with i each step
         int pos_byte = 0;
         int pos_bit = 0;
 
@@ -81,9 +77,13 @@ public class Main {
                 case 7: byte_i = (byte)(prime_bits[pos_byte] & 0b10000000); break;
             }
 
+            //
+            // Found a real prime! process to marking
+            //
             if (byte_i != 0) {
 
                 for (long j = i * i; j <= N; j += i) {
+                    
                     if (j%2!=0)  {
                         
                         long jj = (j-3)/2;
@@ -113,16 +113,9 @@ public class Main {
             } 
         }
 
-        // for (int i = 3; i < prime_bits.length; i+=2)
-        //     if (prime_bits[i]==1)
-        //         primes.add(i);
-        // int size = N/16;
-        // for (int i = 0; i < size - 1; i++)
-        //     if (prime_bits[i]==1)
-        //         primes.add(i*2 + 3);
-
         System.out.println("Done marking. Now counting primes!");
 
+        prime_count = 1;
         pos_byte = 0;
         pos_bit = 0;
         byte byte_i = (byte)0b11111111;
@@ -139,8 +132,10 @@ public class Main {
                 case 7: byte_i = (byte)(prime_bits[pos_byte] & 0b10000000); break;
             }
 
-            if (byte_i!=0)
+            if (byte_i!=0) {
                 prime_count++; //primes.add(i);
+                //System.out.print(i + " ");
+            }
 
             pos_bit++;
             if (pos_bit==8) {
@@ -170,13 +165,11 @@ https://t5k.org/howmany.html
 2,000,000,000       98,222,287  
 */
 
-
-
     public static void main(String args[]) {
         //System.out.println("Start crunching primes in the first " + N + " intergers");
-        searchPrimes(10000000000L);
+        searchPrimes(1000L);
 
         //System.out.println(primes);
-        System.out.println(prime_count/*primes.size()*/);
+        System.out.println(prime_count);
     }
 }
